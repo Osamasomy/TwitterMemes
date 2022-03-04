@@ -14,7 +14,6 @@
     "react-native": "0.67.1",
     "react-native-cli": "^2.0.1",
     "react-native-fast-image": "^8.5.11",
-    "react-native-fs": "^2.19.0",
     "react-native-paper": "^4.11.2",
     "react-native-share": "^7.3.6",
     "react-native-vector-icons": "^9.1.0",
