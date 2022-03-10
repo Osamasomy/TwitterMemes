@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View, FlatList, StatusBar, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, FlatList, StatusBar, Dimensions, SafeAreaView, ActivityIndicator } from 'react-native';
 import React from 'react';
 import FastImage from 'react-native-fast-image'
 import { FAB, Portal, Provider } from 'react-native-paper';
 import Share from 'react-native-share';
-import RNFetchBlob from 'rn-fetch-blob'
+import RNFetchBlob from 'rn-fetch-blob';
+import { AppInstalledChecker } from 'react-native-check-app-install';
 
 
 
@@ -17,10 +18,12 @@ export default function Index() {
     const { open } = state;
     const accessKey = 'TU9-3CGxuCfpnegh-3jRnqr_vIJb-xafQ8jHPJkFtW4'
     const [page, setPage] = React.useState(1)
+    const [load, setLoad] = React.useState(true)
 
 
 
     const getImages = async () => {
+        setLoad(true)
         fetch(`https://api.unsplash.com/photos?page=${page}&client_id=${accessKey}`)
             .then((response) => response.json())
             .then((json) => {
@@ -28,7 +31,10 @@ export default function Index() {
             })
             .catch((error) => {
                 console.error(error);
-            });
+            })
+            .finally(() => {
+                setLoad(false)
+            })
     };
 
     React.useEffect(() => {
@@ -54,18 +60,62 @@ export default function Index() {
             })
     }
 
+    const shareOnWhatsapp = (url) => {
+
+        AppInstalledChecker
+            .isAppInstalled('whatsapp')
+            .then((isInstalled) => {
+                if (isInstalled) {
+                    RNFetchBlob.fetch('GET', `${url}`)
+                        .then(async (res) => {
+                            const shareOption = {
+                                message: 'Test',
+                                url: `data:image/jpeg;base64,${res.base64()}`,
+                                social: Share.Social.WHATSAPP
+                            }
+                            try {
+                                const shareRes = await Share.shareSingle(shareOption)
+                            }
+                            catch (e) {
+                                console.log(e)
+                            }
+                        })
+                }
+                else {
+                    alert("Whatsapp is not installed")
+                }
+            });
+    }
+
+    const OnListEnd = () => {
+        setPage(page + 1)
+    }
+
+    const Footer = () => {
+        return (
+            load ?
+                <View style={{ alignSelf: 'center', marginVertical: 20 }}>
+                    <ActivityIndicator color={'white'} size='large' />
+                </View>
+                : null
+        )
+    }
 
     return (
 
-        <View style={{ flex: 1 }}>
-            <StatusBar translucent backgroundColor={"transparent"} barStyle={'dark-content'} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
+            <StatusBar translucent backgroundColor={"transparent"} barStyle={'light-content'} />
             <FlatList
                 keyExtractor={item => item.id}
                 data={imgData}
-                onEndReached={() => { setPage(page + 1) }}
+                horizontal={false}
+                showsVerticalScrollIndicator={false}
+                onEndReached={OnListEnd}
+                onEndReachedThreshold={0}
+                ListFooterComponent={Footer}
                 renderItem={({ item }) => (
                     <View
-                        style={{ height: height, width: width, backgroundColor: '#eee', alignItems: 'center', justifyContent: "center" }}
+                        style={{ height: height, width: width, alignItems: 'center', justifyContent: "center" }}
                     >
                         <FastImage
                             style={{ width: "100%", height: "100%" }}
@@ -81,16 +131,18 @@ export default function Index() {
                                     open={open}
                                     icon={open ? 'close' : 'plus'}
                                     actions={[
-                                        // {
-                                        //     icon: 'share',
-                                        //     label: 'Share',
-                                        //     onPress: () => console.log('Pressed notifications'),
-                                        // },
                                         {
                                             icon: 'share',
                                             label: 'Share',
                                             onPress: () => { onShare(`${item.urls.small}`) },
-                                            small: false,
+                                        },
+                                        {
+                                            icon: 'whatsapp',
+                                            label: 'Whatsapp',
+                                            onPress: () => {
+                                                shareOnWhatsapp(`${item.urls.small}`)
+                                            },
+                                            small: false
                                         },
                                     ]}
                                     onStateChange={onStateChange}
@@ -106,7 +158,7 @@ export default function Index() {
                 )}
                 pagingEnabled
             />
-        </View>
+        </SafeAreaView>
 
 
     );
