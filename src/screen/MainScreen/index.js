@@ -20,7 +20,7 @@ export default function Index() {
     const [load, setLoad] = React.useState(true)
 
     const showIntertitialAds = () => {
-        const interstitialAd = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL);
+        const interstitialAd = InterstitialAd.createForAdRequest("ca-app-pub-4611656971588059/4236783394");
         interstitialAd.onAdEvent((type, error) => {
             if(type == AdEventType.LOADED)
             {
@@ -48,7 +48,7 @@ export default function Index() {
 
     React.useEffect(() => {
         getImages()
-        if(page % 2 == 0 && page != 0)
+        if(page % 3 == 0 && page != 0)
         {
             showIntertitialAds()
         }
@@ -144,7 +144,8 @@ export default function Index() {
                                             icon: 'whatsapp',
                                             label: 'Whatsapp',
                                             onPress: () => {
-                                                shareOnWhatsapp(`${item.urls.small}`)
+                                                showIntertitialAds()
+                                                // shareOnWhatsapp(`${item.urls.small}`)
                                             },
                                             small: false
                                         },
