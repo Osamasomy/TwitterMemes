@@ -1,4 +1,4 @@
-package com.cricketmemes;
+package com.somy.twittermemes;
 
 import com.facebook.react.ReactActivity;
 

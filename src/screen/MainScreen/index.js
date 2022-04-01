@@ -4,9 +4,8 @@ import FastImage from 'react-native-fast-image'
 import { FAB, Portal, Provider } from 'react-native-paper';
 import Share from 'react-native-share';
 import RNFetchBlob from 'rn-fetch-blob';
-import { AppInstalledChecker } from 'react-native-check-app-install';
-
-
+import AdmobScreen from '../admob';
+import admob,{AdEventType, InterstitialAd, TestIds} from '@react-native-firebase/admob'
 
 const { width, height } = Dimensions.get("window")
 
@@ -20,6 +19,16 @@ export default function Index() {
     const [page, setPage] = React.useState(1)
     const [load, setLoad] = React.useState(true)
 
+    const showIntertitialAds = () => {
+        const interstitialAd = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL);
+        interstitialAd.onAdEvent((type, error) => {
+            if(type == AdEventType.LOADED)
+            {
+                interstitialAd.show()
+            }
+        })
+        interstitialAd.load()
+    }
 
 
     const getImages = async () => {
@@ -39,6 +48,10 @@ export default function Index() {
 
     React.useEffect(() => {
         getImages()
+        if(page % 2 == 0 && page != 0)
+        {
+            showIntertitialAds()
+        }
     }, [page])
 
 
@@ -61,30 +74,20 @@ export default function Index() {
     }
 
     const shareOnWhatsapp = (url) => {
-
-        AppInstalledChecker
-            .isAppInstalled('whatsapp')
-            .then((isInstalled) => {
-                if (isInstalled) {
-                    RNFetchBlob.fetch('GET', `${url}`)
-                        .then(async (res) => {
-                            const shareOption = {
-                                message: 'Test',
-                                url: `data:image/jpeg;base64,${res.base64()}`,
-                                social: Share.Social.WHATSAPP
-                            }
-                            try {
-                                const shareRes = await Share.shareSingle(shareOption)
-                            }
-                            catch (e) {
-                                console.log(e)
-                            }
-                        })
+        RNFetchBlob.fetch('GET', `${url}`)
+            .then(async (res) => {
+                const shareOption = {
+                    message: 'Test',
+                    url: `data:image/jpeg;base64,${res.base64()}`,
+                    social: Share.Social.WHATSAPP
                 }
-                else {
-                    alert("Whatsapp is not installed")
+                try {
+                    const shareRes = await Share.shareSingle(shareOption)
                 }
-            });
+                catch (e) {
+                    console.log(e)
+                }
+            })
     }
 
     const OnListEnd = () => {
@@ -128,6 +131,7 @@ export default function Index() {
                         <Provider>
                             <Portal>
                                 <FAB.Group
+                                style={{bottom: 60, right: 0}}
                                     open={open}
                                     icon={open ? 'close' : 'plus'}
                                     actions={[
@@ -158,6 +162,10 @@ export default function Index() {
                 )}
                 pagingEnabled
             />
+            <View style={{zIndex:100, position: 'absolute', bottom: 0, left: 0}}>
+                <AdmobScreen/>
+            </View>
+            
         </SafeAreaView>
 
 

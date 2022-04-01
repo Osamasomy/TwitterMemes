@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "384929379914",
+    "project_id": "somy-twittermemes",
+    "storage_bucket": "somy-twittermemes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:384929379914:android:287b549ec10182b9c758b3",
+        "android_client_info": {
+          "package_name": "com.somy.twittermemes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "384929379914-jue4fn7k13a6dp3gidue7ndis9ntucf9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwI2Ml15Pyf05f8AGMRLE1VYWRUSfU_dI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "384929379914-jue4fn7k13a6dp3gidue7ndis9ntucf9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
