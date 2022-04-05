@@ -200,6 +200,8 @@ dependencies {
 
     implementation platform('com.google.firebase:firebase-bom:29.2.1')
 
+    implementation project(':react-native-push-notification')
+
     implementation 'com.google.firebase:firebase-analytics'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {

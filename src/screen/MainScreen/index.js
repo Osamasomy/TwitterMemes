@@ -7,7 +7,8 @@ import RNFetchBlob from 'rn-fetch-blob';
 import AdmobScreen from '../admob';
 import admob,{AdEventType, InterstitialAd, TestIds} from '@react-native-firebase/admob'
 
-const { width, height } = Dimensions.get("window")
+
+const { width, height } = Dimensions.get("screen")
 
 export default function Index() {
 
@@ -15,7 +16,8 @@ export default function Index() {
     const onStateChange = ({ open }) => setState({ open });
     const [imgData, setImgData] = React.useState([])
     const { open } = state;
-    const accessKey = 'TU9-3CGxuCfpnegh-3jRnqr_vIJb-xafQ8jHPJkFtW4'
+    // const accessKey = 'TU9-3CGxuCfpnegh-3jRnqr_vIJb-xafQ8jHPJkFtW4'
+    // const api = 'https://api.unsplash.com/photos?page=${page}&client_id=${accessKey}'
     const [page, setPage] = React.useState(1)
     const [load, setLoad] = React.useState(true)
 
@@ -30,28 +32,28 @@ export default function Index() {
         interstitialAd.load()
     }
 
-
     const getImages = async () => {
-        setLoad(true)
-        fetch(`https://api.unsplash.com/photos?page=${page}&client_id=${accessKey}`)
+        // setLoad(true)
+        fetch(`https://twittermemes-somy.herokuapp.com/memes?page=${page}&limit=100`)
             .then((response) => response.json())
             .then((json) => {
-                setImgData(imgData.concat(json))
+                // console.log(json.data)
+                if(json.data === [])
+                {
+                    return
+                }
+                setImgData(imgData.concat(json.data))
             })
             .catch((error) => {
                 console.error(error);
             })
-            .finally(() => {
-                setLoad(false)
-            })
+            // .finally(() => {
+            //     setLoad(false)
+            // })
     };
 
     React.useEffect(() => {
         getImages()
-        if(page % 3 == 0 && page != 0)
-        {
-            showIntertitialAds()
-        }
     }, [page])
 
 
@@ -109,43 +111,51 @@ export default function Index() {
         <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
             <StatusBar translucent backgroundColor={"transparent"} barStyle={'light-content'} />
             <FlatList
-                keyExtractor={item => item.id}
+                keyExtractor={item => item._id}
                 data={imgData}
                 horizontal={false}
                 showsVerticalScrollIndicator={false}
                 onEndReached={OnListEnd}
-                onEndReachedThreshold={0}
+                onEndReachedThreshold={.003}
                 ListFooterComponent={Footer}
                 renderItem={({ item }) => (
-                    <View
-                        style={{ height: height, width: width, alignItems: 'center', justifyContent: "center" }}
-                    >
+                    <View style={{ height: height, width: width }}>
                         <FastImage
-                            style={{ width: "100%", height: "100%" }}
+                            style={{ height: height, width: width }}
                             source={{
-                                uri: `${item.urls.small}`,
+                                uri: `${item.url}`,
                                 priority: FastImage.priority.normal,
+                            }}
+                            
+                            onError = {(error)=>{
+
+                                console.log("==========")
+                                console.log(error.message)
+                                console.log("==========")
+                            
                             }}
                             resizeMode={FastImage.resizeMode.contain}
                         />
                         <Provider>
                             <Portal>
                                 <FAB.Group
-                                style={{bottom: 60, right: 0}}
+                                style={{bottom: 100, right: 0}}
                                     open={open}
                                     icon={open ? 'close' : 'plus'}
                                     actions={[
                                         {
                                             icon: 'share',
                                             label: 'Share',
-                                            onPress: () => { onShare(`${item.urls.small}`) },
+                                            onPress: () => { onShare(`${item.url}`) },
+                                            small:false,
                                         },
                                         {
                                             icon: 'whatsapp',
                                             label: 'Whatsapp',
                                             onPress: () => {
+                                                // push()
                                                 showIntertitialAds()
-                                                // shareOnWhatsapp(`${item.urls.small}`)
+                                                shareOnWhatsapp(`${item.url}`)
                                             },
                                             small: false
                                         },
