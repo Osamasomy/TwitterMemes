@@ -17,7 +17,7 @@ export default class AdmobScreen extends Component {
   render() {
     return (
       <View style={{alignSelf: 'center'}}>
-        <BannerAd size={BannerAdSize.FULL_BANNER} unitId={"ca-app-pub-4611656971588059/9581427658"}></BannerAd>
+        <BannerAd size={BannerAdSize.ADAPTIVE_BANNER} unitId={"ca-app-pub-4611656971588059/9581427658"}></BannerAd>
         </View>
     )
   }
