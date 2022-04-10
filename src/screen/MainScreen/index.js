@@ -54,21 +54,20 @@ export default function Index() {
      */
 
     const apiCall = async (pageIndex)=>{
-        console.log("---------")
-        console.log(pageIndex)
-        console.log("---------")
+        
         fetch(`${baseUrl}/memes?page=${pageIndex}&limit=${limit}`)
                 .then((response) => response.json())
                 .then((res) => {
+                        AsyncStorage.setItem('pageNumber', JSON.stringify(pageIndex))
                         if(pageIndex === 1){
-                            setImgData([])
-                            setImgData(imgData.concat(res.data))
+                            setImgData(res.data)
+                            // setImgData()
                         }
                         else{
-                            setImgData(imgData.concat(res.data))
+                            setImgData([...imgData, ...res.data])
                         }
                         setTotalWithOutLimit(res.totalWithOutLimit)
-                        setTotalWithLimit(res.totalWithLimit)
+                        // setTotalWithLimit(res.totalWithLimit)
                 })
                 .catch((error) => {
                     console.error(error);
@@ -82,24 +81,25 @@ export default function Index() {
     /**
      * Render Function
      */
-    const getImages = async (page) => {
-        let isPage = await AsyncStorage.getItem("pageNumber");
-        isPage = JSON.parse(isPage)
-        if(isPage){
-            apiCall(isPage)
-        }
-        else{
-            await AsyncStorage.setItem('pageNumber', JSON.stringify(page))
-            apiCall(page)   
-        }
+    const getImages = async () => {
+        // let isPage = await AsyncStorage.getItem("pageNumber");
+        // isPage = JSON.parse(isPage)
+        // if(isPage){
+            // apiCall(isPage)
+        // }
+        // else{
+            // await AsyncStorage.setItem('pageNumber', JSON.stringify(page))
+            apiCall()   
+        // }
     
     };
 
 
 
     React.useEffect(() => {
-        getImages(page)
-    }, [])
+        // getImages()
+        apiCall(page);
+    }, [page])
 
 
     /**
@@ -157,17 +157,17 @@ export default function Index() {
      * on list ending function
      */
     const onListEndHandler = async() => {
-        console.log("----CALL FROM HERE---")
+        // console.log("----CALL FROM HERE---")
         let totalPages = Math.ceil(totalWithOutLimit/limit)
-        console.log(totalPages, '<---total pages')
+        // console.log(totalPages, '<---total pages')
 
         if(page >= totalPages) return;
         else
         {
-            const temp = page +1
-            await AsyncStorage.setItem('pageNumber', JSON.stringify(temp))
-            setPage(temp)
-            apiCall(temp)
+            // const temp = page +1
+            
+            setPage(page+1)
+            // apiCall(temp)
 
         }
     }
@@ -180,10 +180,10 @@ export default function Index() {
         // pageNo = pageNo?JSON.parse(pageNo) : 0
         
         // if(pageNo){
-            let tempPage = 1;
-            await AsyncStorage.setItem('pageNumber', JSON.stringify(tempPage))
-            setPage(tempPage)
-            apiCall(tempPage)
+            // let tempPage = 1;
+            // await AsyncStorage.setItem('pageNumber', JSON.stringify(tempPage))
+            setPage(1)
+            // apiCall(tempPage)
         // }
 
         // if(pageNo > 1 || page > 1)
@@ -201,13 +201,13 @@ export default function Index() {
      * 
      * @returns faltlist footer component
      */
-    const footerComponent = () => {
-        return !firstTime && totalWithLimit >= limit ? (
-            <View style={{ justifyContent: 'center', marginHorizontal: 20, flexDirection: 'row', flex:1 }}>
-            <ActivityIndicator color={'white'} size='large' />
-            </View>
-             ): (<></>)
-    }
+    // const footerComponent = () => {
+    //     return !firstTime && totalWithLimit >= limit ? (
+    //         <View style={{ justifyContent: 'center', marginHorizontal: 20, flexDirection: 'row', flex:1 }}>
+    //         <ActivityIndicator color={'white'} size='large' />
+    //         </View>
+    //          ): (<></>)
+    // }
 
 
 
@@ -237,8 +237,8 @@ export default function Index() {
                         pagingEnabled={true}
                         // ListfooterComponent={footerComponent}
                         // onRefresh={onPullDownHandler}
-                        refreshing={refresh}
-                        onEndReachedThreshold={0.003}
+                        // refreshing={refresh}
+                        onEndReachedThreshold={0.5}
                         onEndReached={onListEndHandler}
                         renderItem={(item)=> {
                             return (
