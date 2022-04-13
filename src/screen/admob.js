@@ -1,6 +1,6 @@
-import { Text, View } from 'react-native'
+import {View } from 'react-native'
 import React, { Component } from 'react'
-import admob, {BannerAd,MaxAdContentRating,TestIds, BannerAdSize} from '@react-native-firebase/admob' 
+import admob, {BannerAd,MaxAdContentRating, BannerAdSize} from '@react-native-firebase/admob' 
 
 
 export default class AdmobScreen extends Component {
