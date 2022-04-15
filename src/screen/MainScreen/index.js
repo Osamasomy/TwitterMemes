@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, Dimensions, StatusBar, ActivityIndicator, Image, TouchableOpacity, ScrollView, VirtualizedList } from 'react-native';
+import { StyleSheet, Text, View, FlatList, StatusBar, TouchableHighlight } from 'react-native';
 import React from 'react';
 import AdmobScreen from '../admob';
 import { AdEventType, InterstitialAd } from '@react-native-firebase/admob'
@@ -8,21 +8,44 @@ import FullView from '../../components/FullView';
 import { constants } from '../../helper/constants';
 import GridView from '../../components/GridView';
 import SplashScreen from '../SplashScreen';
+import Tooltip from 'react-native-walkthrough-tooltip';
 
 const limit = 50;
 
 export default function Index() {
 
+    
 
     /**
      * State Management
      */
     const [imgData, setImgData] = React.useState([])
     const [totalWithOutLimit, setTotalWithOutLimit] = React.useState(null)
-    const [firstTime, setFirstTime] = React.useState(true)
     const [page, setPage] = React.useState(1)
     const [isLoading, setIsLoading] = React.useState(true)
-    const [isGrid, setIsGrid] = React.useState({ gridView: false, index: 0 })
+    const [isGrid, setIsGrid] = React.useState({ gridView: true, index: 0 })
+    const [state, setState] = React.useState({
+        showTip: null,
+        showGesture: null
+    })
+
+    /**
+     * Check First Time
+     */
+     const checkFirstTime = async ()=> {
+        let check = await AsyncStorage.getItem('checkFirstTime');
+        check = JSON.parse(check)
+        if(!check){
+            console.log('check first time => true')
+            check = true
+            setState({ ...state, showTip: true})
+            await AsyncStorage.setItem('checkFirstTime', JSON.stringify(check))
+        }
+        else{
+            console.log('not first time')
+            setState({...state, showTip: false})
+        }
+    }
 
 
     /**
@@ -60,7 +83,6 @@ export default function Index() {
                 console.error(error);
             })
             .finally(() => {
-                setFirstTime(false)
                 setIsLoading(false)
             })
     }
@@ -70,6 +92,7 @@ export default function Index() {
      * Fetch page data on Page Change
      */
     React.useEffect(() => {
+        checkFirstTime()
         apiCall(page);
     }, [page])
 
@@ -97,12 +120,14 @@ export default function Index() {
 
 
 
+
+
     /**
      * App Loader
      */
     if (isLoading) {
         return (
-            <SplashScreen/>
+            <SplashScreen />
         )
     }
 
@@ -113,13 +138,26 @@ export default function Index() {
     return (
         <>
 
-            <View style={[styles.header, { height: 60, marginTop: StatusBar.currentHeight }]}>
+            <View style={[styles.header, { marginTop: StatusBar.currentHeight }]}>
                 <Text style={styles.headerTxt}>Twimemes 😂</Text>
+                <Tooltip
+                    isVisible={state.showTip}
+                    content={
+                        <View>
+                            <Text style={{color: '#000'}}>You can toggle between grid and full view</Text>
+                        </View>
+                    }
+                    onClose={() => {setState({...state, showTip: false, showGesture: true})}}
+                    placement="bottom"
+                    // below is for the status bar of react navigation bar
+                    topAdjustment={Platform.OS === 'android' ? -StatusBar.currentHeight : 0}
+                >
                 <MaterialCommunityIcons onPress={toggleView} style={{ marginRight: 10 }} name={isGrid.gridView == false ? "grid" : 'grid-off'} size={30} color='white' />
+                </Tooltip>
             </View>
             <View style={{ flex: 1 }}>
                 <View showsVerticalScrollIndicator={false} style={{ flex: 1, backgroundColor: 'black' }}>
-             
+
                     {
                         isGrid.gridView ?
                             <FlatList
@@ -128,18 +166,18 @@ export default function Index() {
                                 showsHorizontalScrollIndicator={false}
                                 data={imgData}
                                 initialScrollIndex={isGrid.index}
-                                // initialNumToRender= {isGrid.index}
+                                onScroll={()=> {setState({showGesture: false})}}
                                 getItemLayout={(data, index) => (
                                     { length: constants.screenWidth, offset: constants.screenWidth * index, index }
                                 )}
-                                renderItem={({ item }) => <FullView item={item} showIntertitialAds={showIntertitialAds} />}
+                                renderItem={({ item }) => <FullView item={item} showIntertitialAds={showIntertitialAds} firstTime={state.showGesture} />}
                                 keyExtractor={data => data._id}
                                 onEndReachedThreshold={0.5}
                                 onEndReached={onListEndHandler}
                             />
 
                             :
-                            <View style={{ flexWrap: 'wrap', flex: 1, marginBottom: '20%' }}>
+                            <View style={{ flexWrap: 'wrap', flex: 1, marginBottom: '1%' }}>
                                 <FlatList
                                     horizontal={false}
                                     keyExtractor={item => item._id}
@@ -154,7 +192,7 @@ export default function Index() {
 
                     }
                 </View>
-                <View style={{ zIndex: 100, position: 'absolute', bottom: 0, left: 0 }}>
+                <View style={{ bottom: 0, left: 0, }}>
                     <AdmobScreen />
                 </View>
             </View>
@@ -176,9 +214,7 @@ const styles = StyleSheet.create({
     },
     headerTxt: {
         color: '#fff',
-        fontSize: 24,
-        fontWeight: '700',
+        fontSize: 21,
+        fontWeight: 'bold',
     }
 });
-
-
