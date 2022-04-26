@@ -17,8 +17,8 @@ export default class AdmobScreen extends Component {
     }
   render() {
     return (
-      <View style={{alignSelf: 'center', borderWidth:1, borderColor: '#333333', width: '99%', alignItems: 'center', justifyContent:'center', borderStyle:'dashed', backgroundColor: '#000'}}>
-        <Text style={[styles.adsText]}>This Area Contain <Text style={[styles.adsText, {color: '#999999'}]}>Ads</Text></Text>
+      <View style={{alignSelf: 'center', borderWidth:1, borderColor: '#222222', width: '100%', alignItems: 'center', justifyContent:'center', borderStyle:'dashed', backgroundColor: '#000'}}>
+        <Text style={[styles.adsText]}>This Area Contain <Text style={[styles.adsText, {color: '#777777'}]}>Ads</Text></Text>
         <BannerAd size={BannerAdSize.ADAPTIVE_BANNER} unitId={"ca-app-pub-4611656971588059/9581427658"}></BannerAd>
         </View>
     )
@@ -27,6 +27,6 @@ export default class AdmobScreen extends Component {
 
 const styles = StyleSheet.create({
   adsText:{
-    color: '#777777' , position: 'absolute', zIndex: -10, fontSize:12,
+    color: '#555555' , position: 'absolute', zIndex: -10, fontSize:11,
   }
 })

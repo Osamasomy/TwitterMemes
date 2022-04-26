@@ -1,20 +1,22 @@
-import { StyleSheet, Text, View, FlatList, StatusBar, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, FlatList, StatusBar, TouchableOpacity } from 'react-native';
 import React from 'react';
 import AdmobScreen from '../admob';
 import { AdEventType, InterstitialAd } from '@react-native-firebase/admob'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import FullView from '../../components/FullView';
 import { constants } from '../../helper/constants';
 import GridView from '../../components/GridView';
 import SplashScreen from '../SplashScreen';
 import Tooltip from 'react-native-walkthrough-tooltip';
+import CategoryModal from '../../components/CategoryModal';
 
 const limit = 50;
 
 export default function Index() {
 
-    
+
 
     /**
      * State Management
@@ -25,25 +27,30 @@ export default function Index() {
     const [isLoading, setIsLoading] = React.useState(true)
     const [isGrid, setIsGrid] = React.useState({ gridView: true, index: 0 })
     const [state, setState] = React.useState({
-        showTip: null,
-        showGesture: null
+        showTip1: null,
+        showTip2: null,
+        showGesture: null,
     })
+    const [showModal, setShowModal] = React.useState(false)
+    const [category, setCategory] = React.useState(false)
+    const [categoryName, setCategoryName] = React.useState('Category')
+    const [modalLoading, setModalLoading] = React.useState(false)
 
     /**
      * Check First Time
      */
-     const checkFirstTime = async ()=> {
+    const checkFirstTime = async () => {
         let check = await AsyncStorage.getItem('checkFirstTime');
         check = JSON.parse(check)
-        if(!check){
+        if (!check) {
             console.log('check first time => true')
             check = true
-            setState({ ...state, showTip: true})
+            setState({ ...state, showTip1: true })
             await AsyncStorage.setItem('checkFirstTime', JSON.stringify(check))
         }
-        else{
+        else {
             console.log('not first time')
-            setState({...state, showTip: false})
+            setState({ ...state, showTip1: false })
         }
     }
 
@@ -65,13 +72,27 @@ export default function Index() {
      * 
      * API Call To fetch memes
      */
-    const apiCall = async (pageIndex) => {
+    const apiCall = async (pageIndex, category) => {
 
-        fetch(`${constants.baseURL}/memes?page=${pageIndex}&limit=${limit}`)
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        var raw = JSON.stringify({
+            "categoryId": category ? `${category}` :  null
+        });
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        fetch(`https://twittermemes-somy.herokuapp.com/memes/memesByCategory?page=${pageIndex}&limit=${limit}`, requestOptions)
             .then((response) => response.json())
             .then((res) => {
                 AsyncStorage.setItem('pageNumber', JSON.stringify(pageIndex))
                 if (pageIndex === 1) {
+                    console.log(res.data)
                     setImgData(res.data)
                 }
                 else {
@@ -83,7 +104,11 @@ export default function Index() {
                 console.error(error);
             })
             .finally(() => {
+                setShowModal(false)
                 setIsLoading(false)
+                setTimeout(() => {
+                    setModalLoading(false)
+                }, 500);
             })
     }
 
@@ -120,8 +145,6 @@ export default function Index() {
 
 
 
-
-
     /**
      * App Loader
      */
@@ -137,22 +160,42 @@ export default function Index() {
      */
     return (
         <>
-
             <View style={[styles.header, { marginTop: StatusBar.currentHeight }]}>
-                <Text style={styles.headerTxt}>Twimemes 😂</Text>
+                <CategoryModal visible={showModal} setShowModal={() => { setShowModal(!showModal) }} setCategory={(val) => { setCategory(val); apiCall(1, val) }} category={category} loading={modalLoading} setName={(val)=>{setCategoryName(val)}}/>
                 <Tooltip
-                    isVisible={state.showTip}
+                    isVisible={state.showTip2}
                     content={
                         <View>
-                            <Text style={{color: '#000'}}>You can toggle between grid and full view</Text>
+                            <Text style={{ color: '#000' }}>You can select diffrent categories</Text>
                         </View>
                     }
-                    onClose={() => {setState({...state, showTip: false, showGesture: true})}}
+                    onClose={() => { setState({ ...state, showTip2: false, showGesture: true }) }}
                     placement="bottom"
                     // below is for the status bar of react navigation bar
                     topAdjustment={Platform.OS === 'android' ? -StatusBar.currentHeight : 0}
                 >
-                <MaterialCommunityIcons onPress={toggleView} style={{ marginRight: 10 }} name={isGrid.gridView == false ? "grid" : 'grid-off'} size={30} color='white' />
+                    <TouchableOpacity onPress={() => {
+                        setShowModal(!showModal)
+                        // filter()
+                    }} style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                        <Text style={[styles.headerTxt, { marginRight: 5 }]}>{`${categoryName}`}</Text>
+                        <Ionicons name='md-caret-down' color={'white'} size={20} />
+                    </TouchableOpacity>
+                </Tooltip>
+
+                <Tooltip
+                    isVisible={state.showTip1}
+                    content={
+                        <View>
+                            <Text style={{ color: '#000' }}>You can toggle between grid and full view</Text>
+                        </View>
+                    }
+                    onClose={() => { setState({ ...state, showTip1: false, showTip2: true }) }}
+                    placement="bottom"
+                    // below is for the status bar of react navigation bar
+                    topAdjustment={Platform.OS === 'android' ? -StatusBar.currentHeight : 0}
+                >
+                    <MaterialCommunityIcons onPress={toggleView} style={{ marginRight: 10 }} name={isGrid.gridView == false ? "grid" : 'grid-off'} size={30} color='white' />
                 </Tooltip>
             </View>
             <View style={{ flex: 1 }}>
@@ -166,7 +209,7 @@ export default function Index() {
                                 showsHorizontalScrollIndicator={false}
                                 data={imgData}
                                 initialScrollIndex={isGrid.index}
-                                onScroll={()=> {setState({showGesture: false})}}
+                                onScroll={() => { setState({ ...state, showGesture: false }) }}
                                 getItemLayout={(data, index) => (
                                     { length: constants.screenWidth, offset: constants.screenWidth * index, index }
                                 )}

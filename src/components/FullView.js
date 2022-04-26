@@ -1,4 +1,4 @@
-import { Image, StatusBar, View, TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { Image, StatusBar, View, ActivityIndicator } from 'react-native'
 import React from 'react'
 import FastImage from 'react-native-fast-image'
 import { FloatingAction } from "react-native-floating-action";
@@ -66,8 +66,6 @@ export default function FullView({ showIntertitialAds, item, firstTime }) {
         }
     }
 
-    console.log(firstTime)
-
     return (
         <View style={{ height: constants.screenHeight - StatusBar.currentHeight - 60, width: constants.screenWidth, flex: 1, backgroundColor: 'black' }}>
             {
@@ -75,16 +73,21 @@ export default function FullView({ showIntertitialAds, item, firstTime }) {
                     <Image source={require('../assets/gesture.gif')} style={{ height: 140 }} resizeMode='contain' />
                 </View> : <></>
             }
-
-
+            <View style={{alignItems: 'center', justifyContent:"center"}}>
             <FastImage
-                style={{ height: '90%', width: '102%', zIndex: -100 }}
+                style={{ height: '90%', width: '102%', zIndex: -10 }}
                 source={{
                     uri: `${item.url}`,
                     priority: FastImage.priority.normal,
                 }}
                 resizeMode={FastImage.resizeMode.contain}
             />
+            <View style={{height: '90%', width: '102%', zIndex: -20, position: 'absolute', alignItems: 'center', justifyContent: 'center'}}>
+                <ActivityIndicator size={'large'} color={'#fff'}/>
+            </View>
+
+            </View>
+            
 
             <View style={{ bottom: '1%', right: '-5%' }}>
                 <FloatingAction
