@@ -78,7 +78,7 @@ export default function Index() {
         myHeaders.append("Content-Type", "application/json");
 
         var raw = JSON.stringify({
-            "categoryId": category ? `${category}` :  null
+            "categoryId": category ? `${category}` : null
         });
         var requestOptions = {
             method: 'POST',
@@ -106,9 +106,7 @@ export default function Index() {
             .finally(() => {
                 setShowModal(false)
                 setIsLoading(false)
-                setTimeout(()=>{
-                    setModalLoading(false)
-                },500)
+                setModalLoading(false)
             })
     }
 
@@ -162,7 +160,7 @@ export default function Index() {
         <>
             <View style={[styles.header, { marginTop: StatusBar.currentHeight }]}>
                 {
-                    isEmpty ? <></> :  <CategoryModal visible={showModal} setShowModal={() => { setShowModal(!showModal) }} setCategory={(val) => { setCategory(val); apiCall(1, val) }} category={category} setModalLoading={(val)=> {setModalLoading(val)}} loading={modalLoading} setName={(val)=>{setCategoryName(val)}} setEmpty={(val)=> {setIsEmpty(val)}}/>
+                    isEmpty ? <></> : <CategoryModal visible={showModal} setShowModal={() => { setShowModal(!showModal) }} setCategory={(val) => { setCategory(val); apiCall(1, val) }} category={category} setModalLoading={(val) => { setModalLoading(val) }} loading={modalLoading} setName={(val) => { setCategoryName(val) }} setEmpty={(val) => { setIsEmpty(val) }} />
                 }
                 <Tooltip
                     isVisible={state.showTip2}
