@@ -8,7 +8,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 
 
-const CategoryModal = ({ visible, setShowModal, setCategory, category, loading, setName }) => {
+const CategoryModal = ({ visible, setShowModal, setCategory, category, loading, setName , setEmpty, setModalLoading}) => {
 
     const [categoryFromApi, setCategoryFromApi] = React.useState(false)
 
@@ -21,6 +21,10 @@ const CategoryModal = ({ visible, setShowModal, setCategory, category, loading, 
         fetch(`https://twittermemes-somy.herokuapp.com/memes/categories`)
             .then((response) => response.json())
             .then((res) => {
+                if(res.data.length == 0)
+                {
+                    setEmpty(true)
+                }
                 setCategoryFromApi(res.data)
             })
     }
@@ -53,6 +57,7 @@ const CategoryModal = ({ visible, setShowModal, setCategory, category, loading, 
                                                         setCategory(`${item.item._id}`)
                                                         setChecked(`${item.item.name}`)
                                                         setName(`${item.item.name}`)
+                                                        setModalLoading(true)
                                                     }
                                                     }
                                                 />
@@ -72,6 +77,7 @@ const CategoryModal = ({ visible, setShowModal, setCategory, category, loading, 
                                                     setCategory(null)
                                                     setChecked("All")
                                                     setName("All")
+                                                    setModalLoading(true)
                                                 }
                                                 }
                                             />

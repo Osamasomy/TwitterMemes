@@ -35,6 +35,7 @@ export default function Index() {
     const [category, setCategory] = React.useState(false)
     const [categoryName, setCategoryName] = React.useState('Category')
     const [modalLoading, setModalLoading] = React.useState(false)
+    const [isEmpty, setIsEmpty] = React.useState(false)
 
     /**
      * Check First Time
@@ -73,7 +74,6 @@ export default function Index() {
      * API Call To fetch memes
      */
     const apiCall = async (pageIndex, category) => {
-
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
@@ -106,9 +106,9 @@ export default function Index() {
             .finally(() => {
                 setShowModal(false)
                 setIsLoading(false)
-                setTimeout(() => {
+                setTimeout(()=>{
                     setModalLoading(false)
-                }, 500);
+                },500)
             })
     }
 
@@ -161,7 +161,9 @@ export default function Index() {
     return (
         <>
             <View style={[styles.header, { marginTop: StatusBar.currentHeight }]}>
-                <CategoryModal visible={showModal} setShowModal={() => { setShowModal(!showModal) }} setCategory={(val) => { setCategory(val); apiCall(1, val) }} category={category} loading={modalLoading} setName={(val)=>{setCategoryName(val)}}/>
+                {
+                    isEmpty ? <></> :  <CategoryModal visible={showModal} setShowModal={() => { setShowModal(!showModal) }} setCategory={(val) => { setCategory(val); apiCall(1, val) }} category={category} setModalLoading={(val)=> {setModalLoading(val)}} loading={modalLoading} setName={(val)=>{setCategoryName(val)}} setEmpty={(val)=> {setIsEmpty(val)}}/>
+                }
                 <Tooltip
                     isVisible={state.showTip2}
                     content={
