@@ -159,7 +159,7 @@ export default function Index() {
     return (
         <>
             <View style={[styles.header, { marginTop: StatusBar.currentHeight }]}>
-                {
+                {/* {
                     isEmpty ? <></> : <CategoryModal visible={showModal} setShowModal={() => { setShowModal(!showModal) }} setCategory={(val) => { setCategory(val); apiCall(1, val) }} category={category} setModalLoading={(val) => { setModalLoading(val) }} loading={modalLoading} setName={(val) => { setCategoryName(val) }} setEmpty={(val) => { setIsEmpty(val) }} />
                 }
                 <Tooltip
@@ -181,7 +181,10 @@ export default function Index() {
                         <Text style={[styles.headerTxt, { marginRight: 5 }]}>{`${categoryName}`}</Text>
                         <Ionicons name='md-caret-down' color={'white'} size={20} />
                     </TouchableOpacity>
-                </Tooltip>
+                </Tooltip> */}
+                <View>
+                    <Text style={{color: '#fff', fontSize: 22, fontWeight: '800'}}>Twimemes 😂</Text>
+                </View>
 
                 <Tooltip
                     isVisible={state.showTip1}
@@ -190,7 +193,7 @@ export default function Index() {
                             <Text style={{ color: '#000' }}>You can toggle between grid and full view</Text>
                         </View>
                     }
-                    onClose={() => { setState({ ...state, showTip1: false, showTip2: true }) }}
+                    onClose={() => { setState({ ...state, showTip1: false, showGesture: true}) }}
                     placement="bottom"
                     // below is for the status bar of react navigation bar
                     topAdjustment={Platform.OS === 'android' ? -StatusBar.currentHeight : 0}
